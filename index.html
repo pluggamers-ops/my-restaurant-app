@@ -3,82 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สั่งอาหาร</title>
-    <!-- เรียกใช้งาน Tailwind CSS สำหรับตกแต่งหน้าเว็บ -->
+    <title>เมนูอาหาร</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #f9f9f9; }
+        /* ซ่อน Scrollbar สำหรับเมนูหมวดหมู่ */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .btn-gold {
+            background: linear-gradient(180deg, #fbe08d 0%, #e0bb4f 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header-bg {
+            background: linear-gradient(180deg, #fbe89e 0%, #e8ca68 100%);
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans pb-20">
+<body class="pb-28">
 
-    <!-- แถบด้านบน -->
-    <div class="bg-orange-500 text-white p-4 shadow-md text-center">
-        <h1 class="text-2xl font-bold">ร้านอาหารอร่อยเหาะ</h1>
-        <div class="mt-2">
-            <label for="tableNumber" class="text-sm">เลือกหมายเลขโต๊ะ:</label>
-            <select id="tableNumber" class="text-black ml-2 p-1 rounded">
-                <option value="1">โต๊ะ 1</option>
-                <option value="2">โต๊ะ 2</option>
-                <option value="3">โต๊ะ 3</option>
-                <option value="4">โต๊ะ 4</option>
-                <option value="5">โต๊ะ 5</option>
+    <!-- แถบด้านบน (Header) -->
+    <div class="header-bg p-4 sticky top-0 z-50 shadow-sm flex justify-between items-center">
+        <button class="text-gray-800 text-2xl px-2">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="text-sm font-medium bg-white/50 px-4 py-1 rounded-full">
+            โต๊ะ: <select id="tableNumber" class="bg-transparent font-bold outline-none">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
             </select>
         </div>
+        <div class="flex gap-4 text-gray-800 text-xl items-center">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-regular fa-rectangle-list"></i>
+            <i class="fa-regular fa-circle-user"></i>
+        </div>
+    </div>
+
+    <!-- หมวดหมู่เมนู (เลื่อนซ้ายขวาได้) -->
+    <div class="bg-white flex overflow-x-auto px-4 py-3 gap-4 shadow-sm sticky top-[68px] z-40 scrollbar-hide whitespace-nowrap items-center text-sm">
+        <div class="btn-gold px-5 py-2 rounded-full font-medium text-black">จานผัดรสเด็ดจัดจ้าน</div>
+        <div class="text-gray-600 px-2 py-2 cursor-pointer">เมนูเติมพลัง...ฮีโร่ตัวจิ๋ว</div>
+        <div class="text-gray-600 px-2 py-2 cursor-pointer">เมนูซิกเนเจอร์</div>
     </div>
 
     <!-- รายการอาหาร -->
-    <div class="max-w-md mx-auto mt-6 px-4">
-        <h2 class="text-xl font-semibold mb-4">เมนูแนะนำ</h2>
+    <div class="p-4 space-y-4">
         
-        <div class="grid grid-cols-2 gap-4">
-            <!-- เมนูที่ 1 -->
-            <div class="bg-white rounded-lg shadow p-3 text-center">
-                <div class="bg-gray-200 h-24 rounded mb-2 flex items-center justify-center text-gray-500">รูปผัดกะเพรา</div>
-                <h3 class="font-medium">ข้าวกะเพราหมูสับ</h3>
-                <p class="text-orange-500 font-bold mb-2">50 บาท</p>
-                <button onclick="addToCart('ข้าวกะเพราหมูสับ', 50)" class="bg-blue-500 text-white px-4 py-1 rounded w-full hover:bg-blue-600">+ สั่ง</button>
-            </div>
-            
-            <!-- เมนูที่ 2 -->
-            <div class="bg-white rounded-lg shadow p-3 text-center">
-                <div class="bg-gray-200 h-24 rounded mb-2 flex items-center justify-center text-gray-500">รูปต้มยำ</div>
-                <h3 class="font-medium">ต้มยำกุ้ง</h3>
-                <p class="text-orange-500 font-bold mb-2">120 บาท</p>
-                <button onclick="addToCart('ต้มยำกุ้ง', 120)" class="bg-blue-500 text-white px-4 py-1 rounded w-full hover:bg-blue-600">+ สั่ง</button>
-            </div>
-
-            <!-- เมนูที่ 3 -->
-            <div class="bg-white rounded-lg shadow p-3 text-center">
-                <div class="bg-gray-200 h-24 rounded mb-2 flex items-center justify-center text-gray-500">รูปชาไทย</div>
-                <h3 class="font-medium">ชาไทยเย็น</h3>
-                <p class="text-orange-500 font-bold mb-2">40 บาท</p>
-                <button onclick="addToCart('ชาไทยเย็น', 40)" class="bg-blue-500 text-white px-4 py-1 rounded w-full hover:bg-blue-600">+ สั่ง</button>
+        <!-- เมนูที่ 1 -->
+        <div class="bg-white rounded-xl shadow-sm p-3 flex gap-4">
+            <img src="https://images.unsplash.com/photo-1626804475297-41609ea264eb?q=80&w=300&auto=format&fit=crop" class="w-24 h-24 object-cover rounded-lg" alt="Pork Rice">
+            <div class="flex-1 flex flex-col justify-between">
+                <h3 class="text-[15px] leading-tight text-gray-800">Pork Rice</h3>
+                <p class="text-[18px] font-medium mt-1">฿ 69.00</p>
+                <div class="flex justify-end mt-1">
+                    <button onclick="addToCart('Pork Rice', 69)" class="btn-gold px-6 py-1.5 rounded-full text-sm font-medium w-[100px]">เพิ่ม +</button>
+                </div>
             </div>
         </div>
+
+        <!-- เมนูที่ 2 -->
+        <div class="bg-white rounded-xl shadow-sm p-3 flex gap-4">
+            <img src="https://images.unsplash.com/photo-1579932626154-1594cb02afae?q=80&w=300&auto=format&fit=crop" class="w-24 h-24 object-cover rounded-lg" alt="ข้าวผัดกะเพราหมูชิ้น">
+            <div class="flex-1 flex flex-col justify-between">
+                <h3 class="text-[15px] leading-tight text-gray-800">ข้าวผัดกะเพราหมูชิ้น Basil Pork Slice Rice</h3>
+                <p class="text-[18px] font-medium mt-1">฿ 75.00</p>
+                <div class="flex justify-end mt-1">
+                    <button onclick="addToCart('ข้าวผัดกะเพราหมูชิ้น', 75)" class="btn-gold px-6 py-1.5 rounded-full text-sm font-medium w-[100px]">เพิ่ม +</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- เมนูที่ 3 -->
+        <div class="bg-white rounded-xl shadow-sm p-3 flex gap-4">
+            <img src="https://images.unsplash.com/photo-1605333396914-2314d2009227?q=80&w=300&auto=format&fit=crop" class="w-24 h-24 object-cover rounded-lg" alt="ข้าวผัดกะเพราสามชั้น">
+            <div class="flex-1 flex flex-col justify-between">
+                <h3 class="text-[15px] leading-tight text-gray-800">ข้าวผัดกะเพราสามชั้นสไลด์ Basil Sliced Pork Belly</h3>
+                <p class="text-[18px] font-medium mt-1">฿ 75.00</p>
+                <div class="flex justify-end mt-1">
+                    <button onclick="addToCart('ข้าวผัดกะเพราสามชั้นสไลด์', 75)" class="btn-gold px-6 py-1.5 rounded-full text-sm font-medium w-[100px]">เพิ่ม +</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- เมนูที่ 4 -->
+        <div class="bg-white rounded-xl shadow-sm p-3 flex gap-4">
+            <img src="https://images.unsplash.com/photo-1603593444453-3c94f57c52f7?q=80&w=300&auto=format&fit=crop" class="w-24 h-24 object-cover rounded-lg" alt="ข้าวผัดกะเพรากุ้ง">
+            <div class="flex-1 flex flex-col justify-between">
+                <h3 class="text-[15px] leading-tight text-gray-800">ข้าวผัดกะเพรากุ้ง Basil Shrimp Rice</h3>
+                <p class="text-[18px] font-medium mt-1">฿ 109.00</p>
+                <div class="flex justify-end mt-1">
+                    <button onclick="addToCart('ข้าวผัดกะเพรากุ้ง', 109)" class="btn-gold px-6 py-1.5 rounded-full text-sm font-medium w-[100px]">เพิ่ม +</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- เมนูที่ 5 -->
+        <div class="bg-white rounded-xl shadow-sm p-3 flex gap-4">
+            <img src="https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?q=80&w=300&auto=format&fit=crop" class="w-24 h-24 object-cover rounded-lg" alt="ข้าวผัดกะเพราปลาหมึก">
+            <div class="flex-1 flex flex-col justify-between">
+                <h3 class="text-[15px] leading-tight text-gray-800">ข้าวผัดกะเพราปลาหมึก Basil Squid Rice</h3>
+                <p class="text-[18px] font-medium mt-1">฿ 99.00</p>
+                <div class="flex justify-end mt-1">
+                    <button onclick="addToCart('ข้าวผัดกะเพราปลาหมึก', 99)" class="btn-gold px-6 py-1.5 rounded-full text-sm font-medium w-[100px]">เพิ่ม +</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- ตะกร้าสินค้าด้านล่าง -->
-    <div class="fixed bottom-0 w-full bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.1)] p-4">
+    <!-- ตะกร้าสินค้าด้านล่างสุด (แสดงเมื่อมีของในตะกร้า) -->
+    <div id="cart-bar" class="fixed bottom-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] hidden z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div>
-                <p class="text-sm text-gray-600">รวม <span id="total-items" class="font-bold text-black">0</span> รายการ</p>
-                <p class="text-lg font-bold text-orange-500"><span id="total-price">0</span> บาท</p>
+                <p class="text-sm text-gray-500 mb-0.5">รวม <span id="total-items" class="font-bold text-gray-800">0</span> รายการ</p>
+                <p class="text-xl font-medium text-gray-800">฿ <span id="total-price">0.00</span></p>
             </div>
-            <button id="checkout-button" onclick="checkout()" class="bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 disabled:bg-gray-400" disabled>
-                ยืนยันการสั่งซื้อ
+            <button id="checkout-button" onclick="checkout()" class="bg-[#2ecc71] text-white px-8 py-2.5 rounded-full font-medium shadow-md hover:bg-green-600 transition-colors">
+                สั่งอาหาร
             </button>
         </div>
     </div>
 
-    <!-- ส่วนของ JavaScript เขียนไว้ตรงนี้ -->
+    <!-- สคริปต์การทำงาน -->
     <script>
-        // ข้อมูลตะกร้าสินค้า
         let cart = [];
-
-        // ลิงก์ Google Sheets ของคุณ
+        
+        // --- เปลี่ยน URL ตรงนี้เป็น URL จาก Google Sheets ของคุณ ---
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQCD5pRR0-FHwsSzk26xmqgoNo42mSAS9yWyBKp3eEUxLMwA7zarqwuWKjcd5oq3XyBA/exec';
 
-        // ฟังก์ชันเพิ่มลงตะกร้า
         function addToCart(name, price) {
-            // เช็คว่ามีเมนูนี้ในตะกร้าหรือยัง
             const existingItem = cart.find(item => item.name === name);
             if (existingItem) {
                 existingItem.quantity += 1;
@@ -88,34 +147,29 @@
             updateCartUI();
         }
 
-        // ฟังก์ชันอัปเดตหน้าจอแผงด้านล่าง
         function updateCartUI() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
             document.getElementById('total-items').innerText = totalItems;
-            document.getElementById('total-price').innerText = totalPrice;
+            document.getElementById('total-price').innerText = totalPrice.toFixed(2);
 
-            const checkoutBtn = document.getElementById('checkout-button');
+            const cartBar = document.getElementById('cart-bar');
             if (totalItems > 0) {
-                checkoutBtn.disabled = false;
+                cartBar.classList.remove('hidden');
             } else {
-                checkoutBtn.disabled = true;
+                cartBar.classList.add('hidden');
             }
         }
 
-        // ฟังก์ชันเตรียมส่งข้อมูลเมื่อกดปุ่มยืนยัน
         function checkout() {
             const tableNumber = document.getElementById('tableNumber').value;
             const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            
-            // เรียกใช้ฟังก์ชันส่งข้อมูล
             submitOrder(tableNumber, cart, totalPrice);
         }
 
-        // ฟังก์ชันส่งข้อมูลไป Google Sheets
         function submitOrder(tableNumber, cart, totalPrice) {
-            const orderItemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
+            const orderItemsText = cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
 
             const data = {
                 table: tableNumber,
@@ -123,10 +177,10 @@
                 total: totalPrice
             };
 
-            // เปลี่ยนข้อความปุ่มเป็นกำลังโหลด
             const checkoutBtn = document.getElementById('checkout-button');
-            checkoutBtn.innerText = 'กำลังส่งออเดอร์...';
+            checkoutBtn.innerText = 'กำลังส่ง...';
             checkoutBtn.disabled = true;
+            checkoutBtn.classList.replace('bg-[#2ecc71]', 'bg-gray-400');
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -135,17 +189,17 @@
             .then(response => response.json())
             .then(result => {
                 if (result.result === 'success') {
-                    alert(`สั่งอาหารสำเร็จสำหรับโต๊ะ ${tableNumber}!\nรอรับอาหารได้เลยครับ`);
-                    // ล้างตะกร้าและรีเฟรชหน้า
+                    alert(`✅ ส่งออเดอร์สำเร็จ!\nโต๊ะ: ${tableNumber}\nรอรับอาหารได้เลยครับ`);
                     cart = [];
                     window.location.reload(); 
                 }
             })
             .catch(error => {
                 console.error('Error!', error.message);
-                alert('เกิดข้อผิดพลาดในการสั่งอาหาร กรุณาลองใหม่อีกครั้ง');
-                checkoutBtn.innerText = 'ยืนยันการสั่งซื้อ';
+                alert('❌ เกิดข้อผิดพลาดในการสั่งอาหาร กรุณาลองใหม่อีกครั้ง');
+                checkoutBtn.innerText = 'สั่งอาหาร';
                 checkoutBtn.disabled = false;
+                checkoutBtn.classList.replace('bg-gray-400', 'bg-[#2ecc71]');
             });
         }
     </script>
