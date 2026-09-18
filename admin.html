@@ -3,68 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการเมนูอาหาร (Admin)</title>
+    <title>ระบบจัดการแอดมิน (Admin)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Kanit', sans-serif; } </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style> 
+        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; } 
+    </style>
 </head>
-<body class="bg-gray-100 p-4 md:p-8">
+<body class="pb-10">
 
-    <div class="max-w-4xl mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">⚙️ จัดการรายการและราคาอาหาร</h1>
-            <button onclick="openModal()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium px-4 py-2 rounded-lg shadow">
-                + เพิ่มเมนูใหม่
+    <!-- แถบเมนูด้านบน (Header Bar) -->
+    <header class="bg-amber-500 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <!-- ปุ่มขีด 3 ขีด (Hamburger Menu) -->
+                <button onclick="toggleSidebar()" class="text-2xl hover:bg-amber-600 w-10 h-10 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="text-xl font-bold tracking-wide">⚙️ ระบบหลังบ้านร้านอาหาร</h1>
+            </div>
+            <a href="/" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors">
+                <i class="fa-solid fa-store"></i> <span class="hidden sm:inline">ไปหน้าสั่งอาหาร</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- เมนูด้านข้าง (Sidebar Menu) -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+    <aside id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-white shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between">
+        <div>
+            <div class="p-5 border-b flex justify-between items-center bg-amber-50">
+                <span class="font-bold text-gray-800 text-lg">📌 เมนูการจัดการ</span>
+                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-700 text-xl px-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <nav class="p-3 space-y-1">
+                <button onclick="filterCategory('ALL')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-amber-50 text-gray-700 font-medium flex items-center gap-3">
+                    <i class="fa-solid fa-utensils text-amber-500"></i> รายการอาหารทั้งหมด
+                </button>
+                <div class="pt-3 pb-1 px-4 text-xs font-semibold text-gray-400 uppercase">กรองตามหมวดหมู่</div>
+                <div id="sidebar-category-list" class="space-y-1">
+                    <!-- รายการหมวดหมู่จะขึ้นตรงนี้ -->
+                </div>
+            </nav>
+        </div>
+        <div class="p-4 border-t text-xs text-center text-gray-400">
+            Admin Management v1.2
+        </div>
+    </aside>
+
+    <!-- เนื้อหาหลัก (Main Content) -->
+    <main class="max-w-6xl mx-auto p-4 md:p-6">
+        
+        <!-- แถบควบคุม + ปุ่มเพิ่มเมนู -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800" id="page-title">จัดการรายการและราคาอาหาร</h2>
+                <p class="text-sm text-gray-500">เพิ่ม แก้ไข หรือปรับราคาเมนูอาหารในระบบ</p>
+            </div>
+            <button onclick="openModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> เพิ่มเมนูใหม่
             </button>
         </div>
 
-        <!-- ตารางรายการอาหาร -->
-        <div class="bg-white rounded-xl shadow overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-50 border-b text-gray-600 text-sm">
-                        <th class="p-4">รูปภาพ</th>
-                        <th class="p-4">ชื่อเมนู</th>
-                        <th class="p-4">หมวดหมู่</th>
-                        <th class="p-4">ราคา (บาท)</th>
-                        <th class="p-4 text-center">จัดการ</th>
-                    </tr>
-                </thead>
-                <tbody id="menu-table-body">
-                    <tr><td colspan="5" class="text-center p-6 text-gray-400">กำลังโหลดข้อมูลเมนู...</td></tr>
-                </tbody>
-            </table>
+        <!-- ตารางแสดงรายการอาหาร -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50/80 border-b border-gray-100 text-gray-500 text-xs font-semibold uppercase tracking-wider">
+                            <th class="p-4">รูปภาพ</th>
+                            <th class="p-4">ชื่อเมนู</th>
+                            <th class="p-4">หมวดหมู่</th>
+                            <th class="p-4">ราคา (บาท)</th>
+                            <th class="p-4 text-center">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menu-table-body" class="divide-y divide-gray-100 text-gray-700 text-sm">
+                        <tr><td colspan="5" class="text-center p-8 text-gray-400">กำลังโหลดข้อมูลเมนู...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    </main>
 
-    <!-- Modal เพิ่ม/แก้ไข เมนู -->
-    <div id="modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
-            <h2 id="modal-title" class="text-xl font-bold mb-4">เพิ่มเมนูใหม่</h2>
+    <!-- หน้าต่างป๊อปอัพ เพิ่ม/แก้ไข (Modal) -->
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl transition-all">
+            <div class="flex justify-between items-center mb-5 border-b pb-3">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-800">เพิ่มเมนูใหม่</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
             <input type="hidden" id="item-id">
             
-            <div class="space-y-3">
+            <div class="space-y-4">
                 <div>
-                    <label class="text-sm font-medium">ชื่อเมนู</label>
-                    <input type="text" id="item-name" class="w-full border p-2 rounded-lg mt-1 outline-none focus:border-yellow-500">
+                    <label class="text-xs font-semibold text-gray-600 block mb-1">ชื่อเมนู</label>
+                    <input type="text" id="item-name" placeholder="เช่น ข้าวผัดกะเพราหมูสับ" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                 </div>
                 <div>
-                    <label class="text-sm font-medium">ราคา (บาท)</label>
-                    <input type="number" id="item-price" class="w-full border p-2 rounded-lg mt-1 outline-none focus:border-yellow-500">
+                    <label class="text-xs font-semibold text-gray-600 block mb-1">ราคา (บาท)</label>
+                    <input type="number" id="item-price" placeholder="75" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                 </div>
+                
+                <!-- เลือกหมวดหมู่แบบ Dropdown -->
                 <div>
-                    <label class="text-sm font-medium">หมวดหมู่</label>
-                    <input type="text" id="item-category" placeholder="เช่น จานผัดรสเด็ดจัดจ้าน" class="w-full border p-2 rounded-lg mt-1 outline-none focus:border-yellow-500">
+                    <label class="text-xs font-semibold text-gray-600 block mb-1">หมวดหมู่</label>
+                    <select id="item-category" onchange="handleCategoryChange(this.value)" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white">
+                        <!-- ตัวเลือกหมวดหมู่จะเพิ่มเข้ามาที่นี่ -->
+                    </select>
                 </div>
+                
+                <!-- ช่องกรอกหมวดหมู่ใหม่ (จะแสดงเมื่อเลือก "เพิ่มหมวดหมู่ใหม่...") -->
+                <div id="new-category-box" class="hidden bg-amber-50 p-3 rounded-xl border border-amber-200">
+                    <label class="text-xs font-semibold text-amber-800 block mb-1">ชื่อหมวดหมู่ใหม่</label>
+                    <input type="text" id="item-new-category" placeholder="เช่น เครื่องดื่ม / ของหวาน" class="w-full border border-amber-300 p-2 rounded-lg text-sm bg-white outline-none focus:border-amber-500">
+                </div>
+
                 <div>
-                    <label class="text-sm font-medium">ลิงก์รูปภาพ (URL)</label>
-                    <input type="text" id="item-image" class="w-full border p-2 rounded-lg mt-1 outline-none focus:border-yellow-500">
+                    <label class="text-xs font-semibold text-gray-600 block mb-1">ลิงก์รูปภาพ (URL)</label>
+                    <input type="text" id="item-image" placeholder="https://..." class="w-full border border-gray-200 p-2.5 rounded-xl text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2 mt-6">
-                <button onclick="closeModal()" class="px-4 py-2 text-gray-500">ยกเลิก</button>
-                <button onclick="saveMenu()" id="btn-save" class="bg-yellow-500 text-white px-5 py-2 rounded-lg font-medium">บันทึก</button>
+            <div class="flex justify-end gap-3 mt-6 pt-3 border-t">
+                <button onclick="closeModal()" class="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-xl">ยกเลิก</button>
+                <button onclick="saveMenu()" id="btn-save" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-xl text-sm font-medium shadow-md transition-all">บันทึก</button>
             </div>
         </div>
     </div>
@@ -72,45 +139,122 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQCD5pRR0-FHwsSzk26xmqgoNo42mSAS9yWyBKp3eEUxLMwA7zarqwuWKjcd5oq3XyBA/exec';
         let menuItems = [];
+        let categories = [];
+        let currentFilter = 'ALL';
 
+        // Toggle Sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        // โหลดข้อมูลเมนู
         function fetchMenu() {
             fetch(SCRIPT_URL)
                 .then(res => res.json())
                 .then(data => {
                     if (data.result === 'success') {
                         menuItems = data.menu;
+                        extractCategories();
+                        renderSidebarCategories();
                         renderTable();
                     }
                 });
         }
 
+        // ดึงรายชื่อหมวดหมู่ทั้งหมดที่มี
+        function extractCategories() {
+            const set = new Set(menuItems.map(i => i.category || 'ทั่วไป'));
+            categories = Array.from(set);
+        }
+
+        // แสดงหมวดหมู่ใน Sidebar
+        function renderSidebarCategories() {
+            const container = document.getElementById('sidebar-category-list');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterCategory('${cat}')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-amber-50 text-gray-600 text-sm flex justify-between items-center">
+                    <span>${cat}</span>
+                    <span class="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">${menuItems.filter(i => i.category === cat).length}</span>
+                </button>
+            `).join('');
+        }
+
+        // กรองเมนูตามหมวดหมู่
+        function filterCategory(cat) {
+            currentFilter = cat;
+            document.getElementById('page-title').innerText = cat === 'ALL' ? 'จัดการรายการและราคาอาหาร' : `หมวดหมู่: ${cat}`;
+            renderTable();
+            toggleSidebar();
+        }
+
+        // แสดงผลตาราง
         function renderTable() {
             const tbody = document.getElementById('menu-table-body');
-            if (menuItems.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-6 text-gray-400">ยังไม่มีรายการอาหาร</td></tr>';
+            const filtered = currentFilter === 'ALL' ? menuItems : menuItems.filter(i => i.category === currentFilter);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-8 text-gray-400">ยังไม่มีรายการอาหารในหมวดนี้</td></tr>';
                 return;
             }
-            tbody.innerHTML = menuItems.map(item => `
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-3"><img src="${item.image}" class="w-12 h-12 object-cover rounded-lg"></td>
-                    <td class="p-3 font-medium">${item.name}</td>
-                    <td class="p-3 text-sm text-gray-500">${item.category}</td>
-                    <td class="p-3 font-semibold text-yellow-600">฿${item.price}</td>
-                    <td class="p-3 text-center space-x-2">
-                        <button onclick="editMenu('${item.id}')" class="text-blue-500 hover:underline">แก้ไข</button>
-                        <button onclick="deleteMenu('${item.id}')" class="text-red-500 hover:underline">ลบ</button>
+
+            tbody.innerHTML = filtered.map(item => `
+                <tr class="hover:bg-gray-50/80 transition-colors">
+                    <td class="p-3">
+                        <img src="${item.image || 'https://via.placeholder.com/100'}" class="w-12 h-12 object-cover rounded-xl border border-gray-100 shadow-sm" onerror="this.src='https://via.placeholder.com/100'">
+                    </td>
+                    <td class="p-3 font-medium text-gray-900">${item.name}</td>
+                    <td class="p-3">
+                        <span class="bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full text-xs font-medium border border-amber-100">${item.category || 'ทั่วไป'}</span>
+                    </td>
+                    <td class="p-3 font-semibold text-gray-900">฿${item.price.toFixed(2)}</td>
+                    <td class="p-3 text-center space-x-1">
+                        <button onclick="editMenu('${item.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                        <button onclick="deleteMenu('${item.id}')" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><i class="fa-solid fa-trash-can"></i> ลบ</button>
                     </td>
                 </tr>
             `).join('');
+        }
+
+        // เตรียมตัวเลือกใน Dropdown
+        function populateCategoryDropdown(selectedCategory = '') {
+            const select = document.getElementById('item-category');
+            let options = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            options += `<option value="__NEW__">➕ เพิ่มหมวดหมู่ใหม่...</option>`;
+            select.innerHTML = options;
+
+            if (selectedCategory && categories.includes(selectedCategory)) {
+                select.value = selectedCategory;
+                handleCategoryChange(selectedCategory);
+            } else if (categories.length > 0) {
+                select.value = categories[0];
+                handleCategoryChange(categories[0]);
+            } else {
+                select.value = '__NEW__';
+                handleCategoryChange('__NEW__');
+            }
+        }
+
+        // จัดการเมื่อเลือก Dropdown
+        function handleCategoryChange(val) {
+            const newBox = document.getElementById('new-category-box');
+            if (val === '__NEW__') {
+                newBox.classList.remove('hidden');
+            } else {
+                newBox.classList.add('hidden');
+            }
         }
 
         function openModal() {
             document.getElementById('item-id').value = '';
             document.getElementById('item-name').value = '';
             document.getElementById('item-price').value = '';
-            document.getElementById('item-category').value = '';
             document.getElementById('item-image').value = '';
+            document.getElementById('item-new-category').value = '';
             document.getElementById('modal-title').innerText = 'เพิ่มเมนูใหม่';
+            
+            populateCategoryDropdown();
             document.getElementById('modal').classList.remove('hidden');
         }
 
@@ -124,9 +268,10 @@
             document.getElementById('item-id').value = item.id;
             document.getElementById('item-name').value = item.name;
             document.getElementById('item-price').value = item.price;
-            document.getElementById('item-category').value = item.category;
             document.getElementById('item-image').value = item.image;
             document.getElementById('modal-title').innerText = 'แก้ไขเมนู';
+
+            populateCategoryDropdown(item.category);
             document.getElementById('modal').classList.remove('hidden');
         }
 
@@ -134,8 +279,16 @@
             const id = document.getElementById('item-id').value;
             const name = document.getElementById('item-name').value;
             const price = document.getElementById('item-price').value;
-            const category = document.getElementById('item-category').value;
             const image = document.getElementById('item-image').value;
+            
+            const categorySelect = document.getElementById('item-category').value;
+            const newCategoryInput = document.getElementById('item-new-category').value.trim();
+            
+            let category = categorySelect;
+            if (categorySelect === '__NEW__') {
+                if (!newCategoryInput) return alert('กรุณาระบุชื่อหมวดหมู่ใหม่');
+                category = newCategoryInput;
+            }
 
             if(!name || !price) return alert('กรุณากรอกชื่อและราคาให้ครบถ้วน');
 
@@ -156,7 +309,7 @@
             })
             .then(res => res.json())
             .then(res => {
-                alert('บันทึกเรียบร้อย!');
+                alert('บันทึกข้อมูลเรียบร้อย!');
                 closeModal();
                 btn.innerText = 'บันทึก';
                 btn.disabled = false;
@@ -172,7 +325,7 @@
             })
             .then(res => res.json())
             .then(res => {
-                alert('ลบเรียบร้อย!');
+                alert('ลบรายการเรียบร้อย!');
                 fetchMenu();
             });
         }
