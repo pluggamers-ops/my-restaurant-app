@@ -62,7 +62,10 @@
                 </div>
                 <div class="space-y-1">
                     <button onclick="switchTab('foodItems')" id="btn-foodItems" class="tab-btn w-full text-left flex items-center gap-3 px-3 py-2.5 text-gray-300 hover:bg-[#2a2d3e] hover:text-white rounded-lg transition-all text-sm border-l-4 border-transparent">
-                        <i class="fa-solid fa-list w-5 text-center text-amber-400"></i> ข้อมูลรายการอาหาร
+                        <i class="fa-solid fa-utensils w-5 text-center text-amber-400"></i> ข้อมูลรายการอาหารทั้งหมด
+                    </button>
+                    <button onclick="switchTab('foodNames')" id="btn-foodNames" class="tab-btn w-full text-left flex items-center gap-3 px-3 py-2.5 text-gray-300 hover:bg-[#2a2d3e] hover:text-white rounded-lg transition-all text-sm border-l-4 border-transparent">
+                        <i class="fa-solid fa-font w-5 text-center text-blue-400"></i> ข้อมูลชื่อรายการอาหาร
                     </button>
                     <button onclick="switchTab('categories')" id="btn-categories" class="tab-btn w-full text-left flex items-center gap-3 px-3 py-2.5 text-gray-300 hover:bg-[#2a2d3e] hover:text-white rounded-lg transition-all text-sm border-l-4 border-transparent">
                         <i class="fa-solid fa-tags w-5 text-center text-green-400"></i> ข้อมูลหมวดหมู่
@@ -149,9 +152,9 @@
         let editingRowIndex = null;
         let sidebarTimer = null;
 
-        // ปรับลำดับฟิลด์ใน schemas ของ foodItems ให้ "ชื่อรายการอาหาร" อยู่ก่อน "หมวดหมู่"
         const schemas = {
-            foodItems: { title: "ข้อมูลรายการอาหาร", sheet: "Menu", fields: ["ชื่อรายการอาหาร", "หมวดหมู่", "ราคา", "รูปภาพ"] },
+            foodItems: { title: "ข้อมูลรายการอาหารทั้งหมด", sheet: "Menu", fields: ["ชื่อรายการอาหาร", "หมวดหมู่", "ราคา", "รูปภาพ"] },
+            foodNames: { title: "ข้อมูลชื่อรายการอาหาร", sheet: "List", fields: ["ชื่อรายการอาหาร"] },
             categories: { title: "ข้อมูลหมวดหมู่", sheet: "Category", fields: ["หมวดหมู่"] }
         };
 
@@ -280,7 +283,6 @@
 
             if (!schema) return;
 
-            // กำหนดหัวตาราง
             let tableFields = currentActiveTab === "foodItems" ? ["รูปภาพ", "ชื่อรายการอาหาร", "หมวดหมู่", "ราคา"] : schema.fields;
 
             let headHTML = "";
@@ -361,6 +363,23 @@
 
         function generateFormFieldHTML(f, val = "") {
             val = (val !== undefined && val !== null) ? String(val).trim() : "";
+
+            if (f === "ชื่อรายการอาหาร" && currentActiveTab === "foodItems") {
+                const list = ALL_DATA.foodNames || [];
+                let optHTML = list.map(item => {
+                    let itemVal = typeof item === 'object' ? (item["ชื่อรายการอาหาร"] || item[Object.keys(item)[0]] || "") : item;
+                    itemVal = String(itemVal).trim();
+                    return `<option value="${itemVal}" ${itemVal === val ? 'selected' : ''}>${itemVal}</option>`;
+                }).join("");
+                return `
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 block mb-1">${f}</label>
+                        <select name="${f}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 bg-gray-50 focus:bg-white">
+                            <option value="">-- เลือกชื่อรายการอาหาร --</option>
+                            ${optHTML}
+                        </select>
+                    </div>`;
+            }
 
             if (f === "รูปภาพ") {
                 return `
