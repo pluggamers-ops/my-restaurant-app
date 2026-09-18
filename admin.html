@@ -398,7 +398,8 @@
                     </div>`;
             }
 
-            if (f === "หมวดหมู่") {
+            // เพิ่มเงื่อนไขให้แสดง Dropdown เฉพาะตอนที่อยู่หน้า foodItems เท่านั้น
+            if (f === "หมวดหมู่" && currentActiveTab === "foodItems") {
                 const list = ALL_DATA.categories || [];
                 let optHTML = list.map(item => {
                     let itemVal = typeof item === 'object' ? (item["หมวดหมู่"] || item["ชื่อหมวดหมู่"] || item[Object.keys(item)[0]] || "") : item;
