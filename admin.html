@@ -173,10 +173,10 @@
         let editingRowIndex = null;
         let sidebarTimer = null;
 
-        // เปลี่ยน Schema เป็นระบบร้านอาหาร
+        // แก้ไข Schema ให้ตรงกับชื่อ Sheet และ Column ใน Google Sheets
         const schemas = {
-            foodItems: { title: "ข้อมูลรายการอาหาร", sheet: "Foods", fields: ["รูปภาพ", "ชื่อรายการอาหาร", "หมวดหมู่", "ราคา"] },
-            categories: { title: "ข้อมูลหมวดหมู่", sheet: "Categories", fields: ["ชื่อหมวดหมู่"] },
+            foodItems: { title: "ข้อมูลรายการอาหาร", sheet: "Menu", fields: ["รูปภาพ", "ชื่อรายการอาหาร", "หมวดหมู่", "ราคา"] },
+            categories: { title: "ข้อมูลหมวดหมู่", sheet: "Category", fields: ["หมวดหมู่"] },
             zones: { title: "ข้อมูลโซน / โต๊ะ", sheet: "Zones", fields: ["ชื่อโซน"] },
             staff: { title: "ข้อมูลพนักงาน", sheet: "Staff", fields: ["ชื่อพนักงาน", "ตำแหน่ง"] },
             store: { title: "ข้อมูลร้าน", sheet: "Store", fields: ["ชื่อร้าน", "รายละเอียด"] }
@@ -237,7 +237,7 @@
                 const res = await fetch(`${API_URL}?action=verifyAdminPassword&password=${encodeURIComponent(inputPass)}`);
                 const result = await res.json();
                 
-                // สำหรับช่วงพัฒนา ข้ามการเช็ครหัสผ่านไปก่อนเหมือนในโค้ดเดิม
+                // ยังคงใช้ Bypass ให้เข้าได้ทุกกรณีตามที่คุณต้องการ "ไว้ก่อน"
                 sessionStorage.setItem("adminAuth", "true");
                 document.getElementById("loginModal").classList.add("hidden");
                 Swal.fire({ icon: "success", title: "เข้าสู่ระบบสำเร็จ", timer: 1200, showConfirmButton: false });
@@ -401,7 +401,7 @@
             if (f === "หมวดหมู่") {
                 const list = ALL_DATA.categories || [];
                 let optHTML = list.map(item => {
-                    let itemVal = typeof item === 'object' ? (item["ชื่อหมวดหมู่"] || item[Object.keys(item)[0]] || "") : item;
+                    let itemVal = typeof item === 'object' ? (item["หมวดหมู่"] || item["ชื่อหมวดหมู่"] || item[Object.keys(item)[0]] || "") : item;
                     itemVal = String(itemVal).trim();
                     return `<option value="${itemVal}" ${itemVal === val ? 'selected' : ''}>${itemVal}</option>`;
                 }).join("");
