@@ -1,35 +1,52 @@
-// เอา URL ที่ได้จากขั้นตอนที่ 2 มาใส่ในเครื่องหมายคำพูดด้านล่างนี้
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQCD5pRR0-FHwsSzk26xmqgoNo42mSAS9yWyBKp3eEUxLMwA7zarqwuWKjcd5oq3XyBA/exec'; 
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ร้านอาหารของเรา</title>
+    <!-- โค้ดดึง CSS (เช่น Tailwind) จะอยู่ตรงนี้ -->
+</head>
+<body>
+    <!-- โค้ดส่วนแสดงผลหน้าเว็บ เช่น หัวเว็บ, เมนูอาหาร, ตะกร้าสินค้า -->
+    <div id="app">
+        <!-- ... -->
+        <button id="checkout-button" onclick="submitOrder(1, cart, 150)">ยืนยันการสั่งซื้อ</button>
+    </div>
 
-function submitOrder(tableNumber, cart, totalPrice) {
-  // นำรายการอาหารมารวมเป็นข้อความยาวๆ เช่น "กะเพรา x2, ชาเย็น x1"
-  const orderItemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
+    <!-- ส่วนที่ใช้เขียนโค้ดการทำงาน (JavaScript) จะต้องอยู่ในแท็ก script เสมอ -->
+    <script>
+        // โค้ดการทำงานอื่นๆ เช่น การเพิ่มลงตะกร้า จะอยู่ด้านบนนี้
 
-  // เตรียมข้อมูลที่จะส่งไป Google Sheets
-  const data = {
-    table: tableNumber,
-    items: orderItemsText,
-    total: totalPrice
-  };
+        // นำโค้ด Google Sheets ของคุณมาต่อไว้ตรงนี้
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQCD5pRR0-FHwsSzk26xmqgoNo42mSAS9yWyBKp3eEUxLMwA7zarqwuWKjcd5oq3XyBA/exec'; 
 
-  // เปลี่ยนปุ่มเป็นกำลังโหลด
-  document.getElementById('checkout-button').innerText = 'กำลังส่งออเดอร์...';
+        function submitOrder(tableNumber, cart, totalPrice) {
+            const orderItemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
 
-  // ส่งข้อมูลไปที่ Google Sheets
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify(data)
-  })
-  .then(response => response.json())
-  .then(result => {
-    if (result.result === 'success') {
-      alert('สั่งอาหารสำเร็จ! ข้อมูลถูกส่งไปยังร้านแล้ว');
-      // ล้างตะกร้าสินค้าและรีเซ็ตหน้าจอ (เขียนโค้ดล้างตะกร้าของคุณตรงนี้)
-      window.location.reload(); 
-    }
-  })
-  .catch(error => {
-    console.error('Error!', error.message);
-    alert('เกิดข้อผิดพลาดในการสั่งอาหาร กรุณาลองใหม่อีกครั้ง');
-  });
-}
+            const data = {
+                table: tableNumber,
+                items: orderItemsText,
+                total: totalPrice
+            };
+
+            document.getElementById('checkout-button').innerText = 'กำลังส่งออเดอร์...';
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.result === 'success') {
+                    alert('สั่งอาหารสำเร็จ! ข้อมูลถูกส่งไปยังร้านแล้ว');
+                    window.location.reload(); 
+                }
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                alert('เกิดข้อผิดพลาดในการสั่งอาหาร กรุณาลองใหม่อีกครั้ง');
+            });
+        }
+    </script>
+</body>
+</html>
