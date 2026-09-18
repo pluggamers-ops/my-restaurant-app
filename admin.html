@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <!-- Sidebar -->
+    <!-- Sidebar (เหลือเฉพาะข้อมูลอาหารและหมวดหมู่) -->
     <aside id="sidebar" 
            onmouseenter="if(sidebarTimer) clearTimeout(sidebarTimer)" 
            onmouseleave="if(this.classList.contains('w-64')) startSidebarTimer()" 
@@ -149,6 +149,7 @@
         let editingRowIndex = null;
         let sidebarTimer = null;
 
+        // ลบ Schema ของ Master Data (โซน/โต๊ะ, พนักงาน, ข้อมูลร้าน) ออกทั้งหมดอย่างถาวร
         const schemas = {
             foodItems: { title: "ข้อมูลรายการอาหาร", sheet: "Menu", fields: ["รูปภาพ", "ชื่อรายการอาหาร", "หมวดหมู่", "ราคา"] },
             categories: { title: "ข้อมูลหมวดหมู่", sheet: "Category", fields: ["หมวดหมู่"] }
@@ -199,7 +200,6 @@
             }
         });
 
-        // ฟังก์ชันตรวจสอบรหัสผ่านแอดมินกับ Google Sheets เซลล์ J2
         async function checkAdminLogin(e) {
             e.preventDefault();
             const inputPass = document.getElementById("adminPasswordInput").value.trim();
