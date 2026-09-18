@@ -3,23 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านอาหารของเรา</title>
-    <!-- โค้ดดึง CSS (เช่น Tailwind) จะอยู่ตรงนี้ -->
+    <title>สั่งอาหาร</title>
+    <!-- เรียกใช้งาน Tailwind CSS สำหรับตกแต่งหน้าเว็บ -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <!-- โค้ดส่วนแสดงผลหน้าเว็บ เช่น หัวเว็บ, เมนูอาหาร, ตะกร้าสินค้า -->
-    <div id="app">
-        <!-- ... -->
-        <button id="checkout-button" onclick="submitOrder(1, cart, 150)">ยืนยันการสั่งซื้อ</button>
+<body class="bg-gray-100 font-sans pb-20">
+
+    <!-- แถบด้านบน -->
+    <div class="bg-orange-500 text-white p-4 shadow-md text-center">
+        <h1 class="text-2xl font-bold">ร้านอาหารอร่อยเหาะ</h1>
+        <div class="mt-2">
+            <label for="tableNumber" class="text-sm">เลือกหมายเลขโต๊ะ:</label>
+            <select id="tableNumber" class="text-black ml-2 p-1 rounded">
+                <option value="1">โต๊ะ 1</option>
+                <option value="2">โต๊ะ 2</option>
+                <option value="3">โต๊ะ 3</option>
+                <option value="4">โต๊ะ 4</option>
+                <option value="5">โต๊ะ 5</option>
+            </select>
+        </div>
     </div>
 
-    <!-- ส่วนที่ใช้เขียนโค้ดการทำงาน (JavaScript) จะต้องอยู่ในแท็ก script เสมอ -->
+    <!-- รายการอาหาร -->
+    <div class="max-w-md mx-auto mt-6 px-4">
+        <h2 class="text-xl font-semibold mb-4">เมนูแนะนำ</h2>
+        
+        <div class="grid grid-cols-2 gap-4">
+            <!-- เมนูที่ 1 -->
+            <div class="bg-white rounded-lg shadow p-3 text-center">
+                <div class="bg-gray-200 h-24 rounded mb-2 flex items-center justify-center text-gray-500">รูปผัดกะเพรา</div>
+                <h3 class="font-medium">ข้าวกะเพราหมูสับ</h3>
+                <p class="text-orange-500 font-bold mb-2">50 บาท</p>
+                <button onclick="addToCart('ข้าวกะเพราหมูสับ', 50)" class="bg-blue-500 text-white px-4 py-1 rounded w-full hover:bg-blue-600">+ สั่ง</button>
+            </div>
+            
+            <!-- เมนูที่ 2 -->
+            <div class="bg-white rounded-lg shadow p-3 text-center">
+                <div class="bg-gray-200 h-24 rounded mb-2 flex items-center justify-center text-gray-500">รูปต้มยำ</div>
+                <h3 class="font-medium">ต้มยำกุ้ง</h3>
+                <p class="text-orange-500 font-bold mb-2">120 บาท</p>
+                <button onclick="addToCart('ต้มยำกุ้ง', 120)" class="bg-blue-500 text-white px-4 py-1 rounded w-full hover:bg-blue-600">+ สั่ง</button>
+            </div>
+
+            <!-- เมนูที่ 3 -->
+            <div class="bg-white rounded-lg shadow p-3 text-center">
+                <div class="bg-gray-200 h-24 rounded mb-2 flex items-center justify-center text-gray-500">รูปชาไทย</div>
+                <h3 class="font-medium">ชาไทยเย็น</h3>
+                <p class="text-orange-500 font-bold mb-2">40 บาท</p>
+                <button onclick="addToCart('ชาไทยเย็น', 40)" class="bg-blue-500 text-white px-4 py-1 rounded w-full hover:bg-blue-600">+ สั่ง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ตะกร้าสินค้าด้านล่าง -->
+    <div class="fixed bottom-0 w-full bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.1)] p-4">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div>
+                <p class="text-sm text-gray-600">รวม <span id="total-items" class="font-bold text-black">0</span> รายการ</p>
+                <p class="text-lg font-bold text-orange-500"><span id="total-price">0</span> บาท</p>
+            </div>
+            <button id="checkout-button" onclick="checkout()" class="bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 disabled:bg-gray-400" disabled>
+                ยืนยันการสั่งซื้อ
+            </button>
+        </div>
+    </div>
+
+    <!-- ส่วนของ JavaScript เขียนไว้ตรงนี้ -->
     <script>
-        // โค้ดการทำงานอื่นๆ เช่น การเพิ่มลงตะกร้า จะอยู่ด้านบนนี้
+        // ข้อมูลตะกร้าสินค้า
+        let cart = [];
 
-        // นำโค้ด Google Sheets ของคุณมาต่อไว้ตรงนี้
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQCD5pRR0-FHwsSzk26xmqgoNo42mSAS9yWyBKp3eEUxLMwA7zarqwuWKjcd5oq3XyBA/exec'; 
+        // ลิงก์ Google Sheets ของคุณ
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQCD5pRR0-FHwsSzk26xmqgoNo42mSAS9yWyBKp3eEUxLMwA7zarqwuWKjcd5oq3XyBA/exec';
 
+        // ฟังก์ชันเพิ่มลงตะกร้า
+        function addToCart(name, price) {
+            // เช็คว่ามีเมนูนี้ในตะกร้าหรือยัง
+            const existingItem = cart.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ name: name, price: price, quantity: 1 });
+            }
+            updateCartUI();
+        }
+
+        // ฟังก์ชันอัปเดตหน้าจอแผงด้านล่าง
+        function updateCartUI() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            document.getElementById('total-items').innerText = totalItems;
+            document.getElementById('total-price').innerText = totalPrice;
+
+            const checkoutBtn = document.getElementById('checkout-button');
+            if (totalItems > 0) {
+                checkoutBtn.disabled = false;
+            } else {
+                checkoutBtn.disabled = true;
+            }
+        }
+
+        // ฟังก์ชันเตรียมส่งข้อมูลเมื่อกดปุ่มยืนยัน
+        function checkout() {
+            const tableNumber = document.getElementById('tableNumber').value;
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            // เรียกใช้ฟังก์ชันส่งข้อมูล
+            submitOrder(tableNumber, cart, totalPrice);
+        }
+
+        // ฟังก์ชันส่งข้อมูลไป Google Sheets
         function submitOrder(tableNumber, cart, totalPrice) {
             const orderItemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
 
@@ -29,7 +123,10 @@
                 total: totalPrice
             };
 
-            document.getElementById('checkout-button').innerText = 'กำลังส่งออเดอร์...';
+            // เปลี่ยนข้อความปุ่มเป็นกำลังโหลด
+            const checkoutBtn = document.getElementById('checkout-button');
+            checkoutBtn.innerText = 'กำลังส่งออเดอร์...';
+            checkoutBtn.disabled = true;
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -38,13 +135,17 @@
             .then(response => response.json())
             .then(result => {
                 if (result.result === 'success') {
-                    alert('สั่งอาหารสำเร็จ! ข้อมูลถูกส่งไปยังร้านแล้ว');
+                    alert(`สั่งอาหารสำเร็จสำหรับโต๊ะ ${tableNumber}!\nรอรับอาหารได้เลยครับ`);
+                    // ล้างตะกร้าและรีเฟรชหน้า
+                    cart = [];
                     window.location.reload(); 
                 }
             })
             .catch(error => {
                 console.error('Error!', error.message);
                 alert('เกิดข้อผิดพลาดในการสั่งอาหาร กรุณาลองใหม่อีกครั้ง');
+                checkoutBtn.innerText = 'ยืนยันการสั่งซื้อ';
+                checkoutBtn.disabled = false;
             });
         }
     </script>
