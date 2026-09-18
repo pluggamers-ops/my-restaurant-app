@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <!-- Sidebar (เหลือเฉพาะข้อมูลอาหารและหมวดหมู่) -->
+    <!-- Sidebar -->
     <aside id="sidebar" 
            onmouseenter="if(sidebarTimer) clearTimeout(sidebarTimer)" 
            onmouseleave="if(this.classList.contains('w-64')) startSidebarTimer()" 
@@ -149,9 +149,9 @@
         let editingRowIndex = null;
         let sidebarTimer = null;
 
-        // ลบ Schema ของ Master Data (โซน/โต๊ะ, พนักงาน, ข้อมูลร้าน) ออกทั้งหมดอย่างถาวร
+        // ปรับลำดับฟิลด์ใน schemas ของ foodItems ให้ "ชื่อรายการอาหาร" อยู่ก่อน "หมวดหมู่"
         const schemas = {
-            foodItems: { title: "ข้อมูลรายการอาหาร", sheet: "Menu", fields: ["รูปภาพ", "ชื่อรายการอาหาร", "หมวดหมู่", "ราคา"] },
+            foodItems: { title: "ข้อมูลรายการอาหาร", sheet: "Menu", fields: ["ชื่อรายการอาหาร", "หมวดหมู่", "ราคา", "รูปภาพ"] },
             categories: { title: "ข้อมูลหมวดหมู่", sheet: "Category", fields: ["หมวดหมู่"] }
         };
 
@@ -280,8 +280,11 @@
 
             if (!schema) return;
 
+            // กำหนดหัวตาราง
+            let tableFields = currentActiveTab === "foodItems" ? ["รูปภาพ", "ชื่อรายการอาหาร", "หมวดหมู่", "ราคา"] : schema.fields;
+
             let headHTML = "";
-            schema.fields.forEach(f => {
+            tableFields.forEach(f => {
                 let wClass = f === "รูปภาพ" ? "w-24" : "";
                 headHTML += `<th class="p-4 ${wClass}">${f}</th>`;
             });
@@ -297,7 +300,7 @@
             }
 
             if (filteredList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${schema.fields.length + 1}" class="px-6 py-12 text-center text-gray-400">ไม่พบข้อมูลในระบบ</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${tableFields.length + 1}" class="px-6 py-12 text-center text-gray-400">ไม่พบข้อมูลในระบบ</td></tr>`;
                 return;
             }
 
@@ -305,7 +308,7 @@
             filteredList.forEach((item, index) => {
                 bodyHTML += `<tr class="hover:bg-gray-50 transition-colors">`;
                 
-                schema.fields.forEach(f => {
+                tableFields.forEach(f => {
                     let val = item[f] !== undefined && item[f] !== null ? item[f] : "-";
                     
                     if (f === "รูปภาพ") {
